@@ -57,59 +57,81 @@ public class ReservationServiceImpl implements ReservationService {
             throw new Exception("Cannot make reservation");
         }
 
-        checkSpot = false;
+
+
+        SpotType neededSpotType = null;
+        if(numberOfWheels>4)
+        {
+            neededSpotType = SpotType.OTHERS;
+        }
+        else if(numberOfWheels>2)
+        {
+            neededSpotType = SpotType.FOUR_WHEELER;
+        }
+        else
+        {
+            neededSpotType = SpotType.TWO_WHEELER;
+        }
+
+
+       checkSpot = false;
+       Spot minSpot = null;
 
         for(Spot spot : spotList)
         {
             if(!spot.getOccupied())
             {
-                if(numberOfWheels >4  && spot.getSpotType().equals(SpotType.OTHERS))
+                if(neededSpotType.equals(SpotType.OTHERS) && spot.getSpotType().equals(SpotType.OTHERS))
                 {
                     int totalPrice = spot.getPricePerHour()*timeInHours;
-                    if(totalPrice < min)
+                    if(totalPrice<min)
                     {
-                        checkSpot=true;
-                        reservation.setSpot(spot);
-                        reservation.setUser(user);
-                        reservation.setNumberOfHours(timeInHours);
+                        min = totalPrice;
+                        minSpot = spot;
+                        checkSpot = true;
                     }
                 }
-                else if(numberOfWheels >2 && spot.getSpotType().equals(SpotType.FOUR_WHEELER))
+
+                else if(neededSpotType.equals(SpotType.FOUR_WHEELER) && (spot.getSpotType().equals(SpotType.OTHERS) ||
+                        spot.getSpotType().equals(SpotType.FOUR_WHEELER)))
                 {
                     int totalPrice = spot.getPricePerHour()*timeInHours;
-                    if(totalPrice < min)
-                    {   checkSpot =true;
-                        reservation.setSpot(spot);
-                        reservation.setUser(user);
-                        reservation.setNumberOfHours(timeInHours);
+                    if(totalPrice<min)
+                    {
+                        min = totalPrice;
+                        minSpot = spot;
+                        checkSpot = true;
                     }
                 }
-                else  if(numberOfWheels <=2 && spot.getSpotType().equals(SpotType.TWO_WHEELER))
-               {
-                   int totalPrice = spot.getPricePerHour()*timeInHours;
-                   if(totalPrice < min)
-                   {
-                       checkSpot = true;
-                      reservation.setSpot(spot);
-                      reservation.setUser(user);
-                      reservation.setNumberOfHours(timeInHours);
-                   }
-              }
-                spot.setParkingLot(parkingLot);
-                spot.getReservationList().add(reservation);
-                spot.setOccupied(true);
+
+                else if(neededSpotType.equals(SpotType.TWO_WHEELER) && (spot.getSpotType().equals(SpotType.OTHERS)||
+                        spot.getSpotType().equals(SpotType.FOUR_WHEELER) || spot.getSpotType().equals(SpotType.TWO_WHEELER)))
+                {
+                    int totalPrice = spot.getPricePerHour()*timeInHours;
+                    if(totalPrice<min)
+                    {
+                        min = totalPrice;
+                        minSpot = spot;
+                        checkSpot = true;
+                    }
+                }
             }
 
         }
 
-        if(!checkSpot)
-        {
-            throw new Exception("Cannot make reservation");
-        }
+        minSpot.setOccupied(true);
 
+        reservation.setSpot(minSpot);
+        reservation.setUser(user);
+        reservation.setNumberOfHours(timeInHours);
+
+        minSpot.getReservationList().add(reservation);
         user.getReservationList().add(reservation);
 
-        reservationRepository3.save(reservation);
+        userRepository3.save(user);
+        spotRepository3.save(minSpot);
+
         return reservation;
+
     }
 }
