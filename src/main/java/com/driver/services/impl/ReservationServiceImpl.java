@@ -35,10 +35,29 @@ public class ReservationServiceImpl implements ReservationService {
             throw new Exception("Cannot make reservation");
         }
 
+
         Reservation reservation = new Reservation();
 
         List<Spot> spotList = parkingLot.getSpotList();
         int min = Integer.MAX_VALUE;
+
+
+        boolean checkSpot = false;
+        for(Spot spot : spotList)
+        {
+            if(!spot.getOccupied())
+            {
+                checkSpot = true;
+                break;
+            }
+        }
+
+        if(!checkSpot)
+        {
+            throw new Exception("Cannot make reservation");
+        }
+
+        checkSpot = false;
 
         for(Spot spot : spotList)
         {
@@ -49,6 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
                     int totalPrice = spot.getPricePerHour()*timeInHours;
                     if(totalPrice < min)
                     {
+                        checkSpot=true;
                         reservation.setSpot(spot);
                         reservation.setUser(user);
                         reservation.setNumberOfHours(timeInHours);
@@ -58,7 +78,7 @@ public class ReservationServiceImpl implements ReservationService {
                 {
                     int totalPrice = spot.getPricePerHour()*timeInHours;
                     if(totalPrice < min)
-                    {
+                    {   checkSpot =true;
                         reservation.setSpot(spot);
                         reservation.setUser(user);
                         reservation.setNumberOfHours(timeInHours);
@@ -69,16 +89,24 @@ public class ReservationServiceImpl implements ReservationService {
                    int totalPrice = spot.getPricePerHour()*timeInHours;
                    if(totalPrice < min)
                    {
+                       checkSpot = true;
                       reservation.setSpot(spot);
                       reservation.setUser(user);
                       reservation.setNumberOfHours(timeInHours);
                    }
               }
-
+                spot.setParkingLot(parkingLot);
+                spot.getReservationList().add(reservation);
+                spot.setOccupied(true);
             }
-            spot.getReservationList().add(reservation);
-            spot.setOccupied(true);
+
         }
+
+        if(!checkSpot)
+        {
+            throw new Exception("Cannot make reservation");
+        }
+
         user.getReservationList().add(reservation);
 
         reservationRepository3.save(reservation);
