@@ -44,7 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
         {
             if(!spot.getOccupied())
             {
-                if(numberOfWheels == 2  && spot.getSpotType().equals(SpotType.TWO_WHEELER))
+                if(numberOfWheels >4  && spot.getSpotType().equals(SpotType.OTHERS))
                 {
                     int totalPrice = spot.getPricePerHour()*timeInHours;
                     if(totalPrice < min)
@@ -54,7 +54,7 @@ public class ReservationServiceImpl implements ReservationService {
                         reservation.setNumberOfHours(timeInHours);
                     }
                 }
-                else if(numberOfWheels <= 4 && spot.getSpotType().equals(SpotType.FOUR_WHEELER))
+                else if(numberOfWheels >2 && spot.getSpotType().equals(SpotType.FOUR_WHEELER))
                 {
                     int totalPrice = spot.getPricePerHour()*timeInHours;
                     if(totalPrice < min)
@@ -64,7 +64,7 @@ public class ReservationServiceImpl implements ReservationService {
                         reservation.setNumberOfHours(timeInHours);
                     }
                 }
-                else  if(numberOfWheels >= 4 && spot.getSpotType().equals(SpotType.OTHERS))
+                else  if(numberOfWheels <=2 && spot.getSpotType().equals(SpotType.TWO_WHEELER))
                {
                    int totalPrice = spot.getPricePerHour()*timeInHours;
                    if(totalPrice < min)
