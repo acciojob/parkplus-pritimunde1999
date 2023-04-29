@@ -119,6 +119,12 @@ public class ReservationServiceImpl implements ReservationService {
 
         }
 
+        if(!checkSpot)
+        {
+            throw new Exception("Cannot make reservation");
+        }
+
+
         minSpot.setOccupied(true);
 
         reservation.setSpot(minSpot);
