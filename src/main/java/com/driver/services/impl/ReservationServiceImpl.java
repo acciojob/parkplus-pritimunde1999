@@ -42,7 +42,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         for(Spot spot : spotList)
         {
-            if(!spot.isOccupied())
+            if(!spot.getOccupied())
             {
                 if(numberOfWheels == 2  && spot.getSpotType().equals(SpotType.TWO_WHEELER))
                 {
